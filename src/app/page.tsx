@@ -1,14 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List, CreditCard, Copy } from 'lucide-react';
+import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List, CreditCard, Copy, Star, Zap } from 'lucide-react';
 
-// UWAGA: IMPORT 'https://esm.sh/@supabase/supabase-js@2' ZOSTAŁ USUNIĘTY.
+// UWAGA: IMPORT Z URL ZOSTAŁ USUNIĘTY DLA ZGODNOŚCI Z VERCEL.
 
 // --- 1. KONFIGURACJA ZMIENNYCH ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+// --- DANE DO OPINII (SOCIAL PROOF) ---
+const TESTIMONIALS = [
+    { id: 1, name: "Marek 'SurRon' K.", text: "Sterownik robi robotę! Mój Sur-Ron w końcu lata na koło jak wściekły. Paczka w 24h.", rating: 5 },
+    { id: 2, name: "Patryk W.", text: "Zamawiałem koła 16 cali. Jakość wykonania top. Kontakt ze sklepem wzorowy.", rating: 5 },
+    { id: 3, name: "Kacper S.", text: "Najlepszy sklep z częściami w PL. Ceny uczciwe, a nie z kosmosu jak u konkurencji.", rating: 5 },
+];
 
 // --- 2. KOMPONENTY WIDOKÓW ---
 
@@ -76,7 +82,6 @@ const AdminView = ({ onBack, supabase }) => {
             setIsAdding(false);
             return;
         }
-        // -----------------------
 
         const { data: productData, error: productError } = await supabase
             .from('products')
@@ -190,6 +195,7 @@ const AdminView = ({ onBack, supabase }) => {
                                     <option value="podnozki">PODNÓŻKI</option>
                                     <option value="baterie">BATERIE</option>
                                     <option value="kontrolery">KONTROLERY</option>
+                                    <option value="opony">OPONY I KOŁA</option>
                                     <option value="akcesoria">AKCESORIA</option>
                                 </select>
                             </div>
@@ -281,6 +287,7 @@ export default function VoltModsApp() {
       { id: 'podnozki', label: 'PODNÓŻKI' },
       { id: 'baterie', label: 'BATERIE' },
       { id: 'kontrolery', label: 'KONTROLERY' },
+      { id: 'opony', label: 'OPONY I KOŁA' },
       { id: 'akcesoria', label: 'AKCESORIA' }
   ];
 
@@ -342,14 +349,14 @@ export default function VoltModsApp() {
     <div className="min-h-screen bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(163,230,53,0.15),rgba(255,255,255,0))] text-white font-sans selection:bg-lime-400 selection:text-black overflow-x-hidden flex flex-col relative">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
       
-      <header className="sticky top-0 z-40 bg-black/60 backdrop-blur-md border-b border-white/10 shadow-lg">
+      <header className="sticky top-0 z-40 bg-black/60 backdrop-blur-md border-b border-white/10 shadow-lg transition-all duration-300">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div onClick={() => { setView('home'); setActiveCategory('ALL'); }} className="flex items-center gap-3 cursor-pointer group">
              <div className="w-14 h-10 bg-lime-400 text-slate-950 font-black flex items-center justify-center text-sm -skew-x-10 border-2 border-lime-400 group-hover:bg-white group-hover:border-white transition-all shadow-[0_0_20px_rgba(163,230,53,0.5)]">VMP</div>
              <div className="text-xl md:text-3xl font-black text-white tracking-tighter italic skew-x-[-10deg] group-hover:scale-105 transition-transform">VOLT MODS <span className="text-lime-400">POLAND</span></div>
           </div>
           
-          <nav className="hidden md:flex space-x-1 text-xs font-bold bg-white/5 p-1 rounded-lg border border-white/5 backdrop-blur-sm">
+          <nav className="hidden xl:flex space-x-1 text-xs font-bold bg-white/5 p-1 rounded-lg border border-white/5 backdrop-blur-sm">
             {CATEGORIES.map(cat => (
                 <button 
                     key={cat.id} 
@@ -368,14 +375,14 @@ export default function VoltModsApp() {
                 </div>
                 {cart.length > 0 && (<span className="absolute -top-1 -right-1 bg-lime-400 text-black text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-lg shadow-lime-400/50">{cart.length}</span>)}
             </div>
-            <Menu className="md:hidden text-lime-400 cursor-pointer" onClick={() => setIsMenuOpen(!isMenuOpen)}/>
+            <Menu className="xl:hidden text-lime-400 cursor-pointer" onClick={() => setIsMenuOpen(!isMenuOpen)}/>
           </div>
         </div>
       </header>
 
       {/* MOBILE MENU */}
       {isMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl p-8 flex flex-col gap-6 items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl p-8 flex flex-col gap-6 items-center justify-center animate-in fade-in zoom-in duration-300">
             <button onClick={() => setIsMenuOpen(false)} className="absolute top-6 right-6 text-lime-400 p-2 border border-lime-400/30 rounded-full"><X size={32}/></button>
             {CATEGORIES.map(cat => (
                 <button key={cat.id} onClick={() => { setActiveCategory(cat.id); setIsMenuOpen(false); setView('home'); }} className={`text-2xl font-black uppercase tracking-widest ${activeCategory === cat.id ? 'text-lime-400 scale-110' : 'text-white/50'}`}>
@@ -395,7 +402,7 @@ export default function VoltModsApp() {
             <div className="flex-1 flex flex-col p-6 overflow-hidden">
                 <div className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-lime-400/30 scrollbar-track-transparent">
                     {cart.length === 0 ? <div className="text-center text-slate-500 mt-20 flex flex-col items-center"><ShoppingBag size={48} className="mb-4 opacity-20"/>Koszyk jest pusty.</div> : cart.map((item) => (
-                    <div key={item.uniqueId} className="flex gap-4 bg-white/5 p-3 rounded-xl border border-white/5 items-center hover:border-lime-400/30 transition-all group">
+                    <div key={item.uniqueId} className="flex gap-4 bg-white/5 p-3 rounded-xl border border-white/5 items-center hover:border-lime-400/30 transition-all group animate-in slide-in-from-right-10 duration-300">
                         <div className="w-16 h-16 bg-black/50 rounded-lg overflow-hidden flex-shrink-0 border border-white/10">{item.image ? <img src={item.image} className="w-full h-full object-cover"/> : <Bike className="m-auto mt-4 text-slate-600"/>}</div>
                         <div className="flex-1"><h4 className="font-bold text-sm text-white uppercase tracking-wide group-hover:text-lime-400 transition-colors">{item.name}</h4><p className="font-mono text-lime-400/80 text-sm">{item.price} PLN</p></div>
                         <button onClick={() => removeFromCart(item.uniqueId)} className="text-slate-600 hover:text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-all"><Trash2 size={18}/></button>
@@ -405,7 +412,7 @@ export default function VoltModsApp() {
             </div>
         )}
         {cartView === 'checkout' && (
-            <form onSubmit={handleSubmitOrder} className="flex-1 flex flex-col p-6 overflow-y-auto space-y-4">
+            <form onSubmit={handleSubmitOrder} className="flex-1 flex flex-col p-6 overflow-y-auto space-y-4 animate-in fade-in duration-300">
                 <input required name="fullName" placeholder="Imię i Nazwisko" onChange={handleInputChange} className="w-full bg-white/5 border border-white/10 rounded-lg p-4 text-sm focus:border-lime-400 focus:bg-black/50 outline-none transition-all placeholder-slate-600"/>
                 <input required name="email" placeholder="Email" onChange={handleInputChange} className="w-full bg-white/5 border border-white/10 rounded-lg p-4 text-sm focus:border-lime-400 focus:bg-black/50 outline-none transition-all placeholder-slate-600"/>
                 <input required name="phone" placeholder="Telefon" onChange={handleInputChange} className="w-full bg-white/5 border border-white/10 rounded-lg p-4 text-sm focus:border-lime-400 focus:bg-black/50 outline-none transition-all placeholder-slate-600"/>
@@ -415,7 +422,7 @@ export default function VoltModsApp() {
             </form>
         )}
         {cartView === 'success' && (
-            <div className="flex-1 flex flex-col items-center p-8 text-center overflow-y-auto">
+            <div className="flex-1 flex flex-col items-center p-8 text-center overflow-y-auto animate-in zoom-in duration-300">
                 <div className="w-20 h-20 bg-lime-400/20 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(163,230,53,0.2)]">
                     <CheckCircle size={40} className="text-lime-400"/>
                 </div>
@@ -458,12 +465,12 @@ export default function VoltModsApp() {
             </div>
         )}
       </div>
-      {isCartOpen && <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm" onClick={() => setIsCartOpen(false)}></div>}
+      {isCartOpen && <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setIsCartOpen(false)}></div>}
 
       <main className="container mx-auto px-4 py-12 flex-1 relative z-10">
         {view === 'admin' ? <AdminView onBack={() => setView('home')} supabase={supabaseClient}/> : view === 'home' ? (
           <>
-            <div className="relative overflow-hidden bg-gradient-to-br from-white/5 to-transparent border border-white/10 p-10 md:p-20 mb-16 rounded-3xl shadow-2xl group">
+            <div className="relative overflow-hidden bg-gradient-to-br from-white/5 to-transparent border border-white/10 p-10 md:p-20 mb-16 rounded-3xl shadow-2xl group animate-in slide-in-from-bottom-10 fade-in duration-700">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-lime-400/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-lime-400/30 transition-all duration-1000"></div>
                 <div className="relative z-10">
                     <h1 className="text-5xl md:text-8xl font-black italic text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-500 mb-4 tracking-tighter drop-shadow-lg">
@@ -472,6 +479,34 @@ export default function VoltModsApp() {
                     <p className="text-slate-400 text-lg md:text-2xl font-light tracking-wide max-w-2xl border-l-4 border-lime-400 pl-6">
                         Premium części i modyfikacje do <strong className="text-white">Sur-Ron</strong> oraz <strong className="text-white">Talaria</strong>. Zbuduj maszynę marzeń.
                     </p>
+                </div>
+            </div>
+
+            {/* NOWA SEKCJA: GRIP MASTERY (OPONY) */}
+            <div className="mb-24 relative overflow-hidden rounded-3xl bg-neutral-900 border border-white/5 animate-in slide-in-from-bottom-10 fade-in duration-1000 delay-200">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30"></div>
+                <div className="absolute -left-20 -bottom-20 w-96 h-96 bg-lime-400/10 rounded-full blur-[80px]"></div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 p-10 md:p-16 relative z-10 items-center">
+                    <div>
+                        <div className="inline-flex items-center gap-2 text-lime-400 font-bold uppercase tracking-widest text-xs mb-4 border border-lime-400/30 px-3 py-1 rounded-full bg-lime-400/10">
+                            <Zap size={14} fill="currentColor"/> Grip Mastery
+                        </div>
+                        <h2 className="text-4xl md:text-6xl font-black italic text-white mb-6 leading-none">PRZYCZEPNOŚĆ <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-500">TO KONTROLA.</span></h2>
+                        <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                            Oryginalne opony to ślizgawka? Zmień to. Oferujemy zestawy kół 19/16" oraz opony enduro, które wgryzają się w teren.
+                        </p>
+                        <button onClick={() => setActiveCategory('opony')} className="bg-white text-black px-8 py-4 font-black uppercase tracking-widest hover:bg-lime-400 transition-all rounded-lg shadow-lg hover:shadow-lime-400/50">
+                            Zobacz Opony i Koła
+                        </button>
+                    </div>
+                    <div className="relative h-64 md:h-96 flex items-center justify-center">
+                         {/* Placeholder na grafikę koła/opony - używam ikony dla demo, w produkcji tutaj byłoby zdjęcie */}
+                         <div className="w-64 h-64 md:w-80 md:h-80 rounded-full border-4 border-dashed border-lime-400/30 flex items-center justify-center animate-[spin_10s_linear_infinite]">
+                            <div className="w-56 h-56 md:w-72 md:h-72 rounded-full border-2 border-white/10 bg-black/50 flex items-center justify-center">
+                                <RefreshCw size={80} className="text-lime-400 opacity-50"/>
+                            </div>
+                         </div>
+                    </div>
                 </div>
             </div>
             
@@ -483,9 +518,9 @@ export default function VoltModsApp() {
                 {activeCategory !== 'ALL' && <span className="bg-lime-400 text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-[0_0_10px_rgba(163,230,53,0.5)]">Filtr Aktywny</span>}
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
                 {!supabaseClient ? <div className="col-span-4 text-center py-32 text-lime-400 flex flex-col items-center animate-pulse"><RefreshCw className="animate-spin mb-4" size={32}/>Łączenie z bazą VMP...</div> : filteredProducts.length === 0 ? <p className="col-span-4 text-slate-500 text-center py-20 border border-dashed border-white/10 rounded-2xl">Brak sprzętu w tej kategorii. Dodaj go w Adminie!</p> : filteredProducts.map((product) => (
-                    <div key={product.id} onClick={() => handleProductClick(product)} className="group bg-white/5 border border-white/5 hover:border-lime-400/50 hover:bg-black/60 backdrop-blur-sm transition-all duration-300 p-5 relative overflow-hidden transform hover:-translate-y-2 rounded-2xl cursor-pointer flex flex-col shadow-lg hover:shadow-[0_0_30px_rgba(163,230,53,0.15)]">
+                    <div key={product.id} onClick={() => handleProductClick(product)} className="group bg-white/5 border border-white/5 hover:border-lime-400/50 hover:bg-black/60 backdrop-blur-sm transition-all duration-300 p-5 relative overflow-hidden transform hover:-translate-y-2 rounded-2xl cursor-pointer flex flex-col shadow-lg hover:shadow-[0_0_30px_rgba(163,230,53,0.15)] animate-in fade-in zoom-in duration-500">
                         <div className="relative aspect-square w-full overflow-hidden mb-5 rounded-xl bg-black/40 border border-white/5">
                             {product.image_url ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" /> : <div className="w-full h-full flex items-center justify-center text-slate-700"><Bike size={48} /></div>}
                             <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold text-lime-400 border border-lime-400/30 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider">Zobacz</div>
@@ -499,6 +534,26 @@ export default function VoltModsApp() {
                         </div>
                     </div>
                 ))}
+            </div>
+
+            {/* NOWA SEKCJA: GARAŻ VMP (OPINIE) */}
+            <div className="border-t border-white/10 pt-16 mb-16">
+                 <h2 className="text-3xl font-black text-center mb-12 italic tracking-tighter text-white">GARAŻ <span className="text-lime-400">VMP</span></h2>
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {TESTIMONIALS.map((review, i) => (
+                        <div key={review.id} className="bg-white/5 p-8 rounded-2xl border border-white/5 hover:border-lime-400/30 transition-all hover:-translate-y-1 relative group">
+                             <div className="text-lime-400 flex gap-1 mb-4">
+                                {[...Array(review.rating)].map((_, i) => <Star key={i} size={16} fill="currentColor"/>)}
+                             </div>
+                             <p className="text-slate-300 italic mb-6">"{review.text}"</p>
+                             <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-black rounded-full flex items-center justify-center font-bold text-xs text-lime-400 border border-white/10">{review.name.charAt(0)}</div>
+                                <span className="font-bold text-sm text-white uppercase tracking-wide">{review.name}</span>
+                             </div>
+                             <div className="absolute top-0 right-0 w-20 h-20 bg-lime-400/5 rounded-bl-full rounded-tr-2xl group-hover:bg-lime-400/10 transition-colors"></div>
+                        </div>
+                    ))}
+                 </div>
             </div>
           </>
         ) : <ProductDetailView product={activeProduct} onBack={() => setView('home')} onAddToCart={(p, v) => { addToCart(p, v); setView('home'); }} />}
