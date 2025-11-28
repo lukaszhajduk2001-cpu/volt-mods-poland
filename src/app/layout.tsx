@@ -1,13 +1,8 @@
-import React from 'react';
 import type { Metadata } from "next";
-// UWAGA: Te linie poniżej są niezbędne w Twoim lokalnym projekcie na komputerze!
-// W tym podglądzie są zakomentowane, aby uniknąć błędów kompilacji.
-// Po zapisaniu pliku na dysku, USUŃ znaki komentarza (//) z początku linii:
+import { Inter } from "next/font/google";
+import "./globals.css";
 
-// import { Inter } from "next/font/google";
-// import "./globals.css";
-
-// const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Volt Mods Poland | Tuning Sur-Ron & Talaria",
@@ -21,8 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl">
-      {/* Lokalnie zamień linię body na: <body className={inter.className}>{children}</body> */}
-      <body style={{ fontFamily: 'sans-serif' }}>{children}</body>
+      {/* Ta linia ładuje styl i czcionki: */}
+      <body className={inter.className}>{children}</body>
+      {/* Wcześniej mogłeś mieć tutaj: <body style={{ fontFamily: 'sans-serif' }}>{children}</body> */}
     </html>
   );
 }
