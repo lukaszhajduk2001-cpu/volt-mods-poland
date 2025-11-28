@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List } from 'lucide-react';
 
-// UWAGA: CELOWO USUNIĘTO LINIJKE IMPORT { createClient } Z URL, KTÓRA POWODOWAŁA BŁĄD KOMPILACJI NA VERCEL.
+// UWAGA: IMPORT 'https://esm.sh/@supabase/supabase-js@2' ZOSTAŁ USUNIĘTY.
 
 // --- 1. KONFIGURACJA ZMIENNYCH ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -278,7 +278,7 @@ export default function VoltModsApp() {
     const loadSupabase = async () => {
         if (typeof window !== 'undefined') {
             if ((window as any).supabase) { setSupabaseClient((window as any).supabase.createClient(supabaseUrl, supabaseKey)); return; }
-            // Używamy tego API, które Vercel akceptuje: https://cdn.jsdelivr.net/npm/@supabase/supabase-js
+            // Używamy tego API, które Vercel akceptuje (dynamiczne ładowanie za pomocą skryptu)
             const script = document.createElement('script');
             script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"; 
             script.async = true;
