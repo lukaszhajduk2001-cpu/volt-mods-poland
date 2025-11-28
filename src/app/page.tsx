@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, Search, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List } from 'lucide-react';
-// Import Supabase z CDN
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List } from 'lucide-react';
+
+// UWAGA: CELOWO USUNIĘTO LINIJKE IMPORT { createClient } Z URL, KTÓRA POWODOWAŁA BŁĄD KOMPILACJI NA VERCEL.
 
 // --- 1. KONFIGURACJA ZMIENNYCH ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
 
 // --- 2. KOMPONENTY WIDOKÓW ---
 
@@ -77,7 +78,7 @@ const AdminView = ({ onBack, supabase }) => {
                 image_url: newProduct.image_url,
                 slug: slug,
                 is_published: true,
-                sku: `VMP-${Math.floor(Math.random() * 10000)}` 
+                sku: `VMP-${Math.floor(Math.random() * 10000)}`
             }])
             .select()
             .single();
@@ -266,7 +267,7 @@ export default function VoltModsApp() {
 
   const CATEGORIES = [
       { id: 'ALL', label: 'WSZYSTKIE' },
-      { id: 'motocykle', label: 'MOTOCYKLE' }, 
+      { id: 'motocykle', label: 'MOTOCYKLE' },
       { id: 'podnozki', label: 'PODNÓŻKI' },
       { id: 'baterie', label: 'BATERIE' },
       { id: 'kontrolery', label: 'KONTROLERY' },
@@ -277,10 +278,16 @@ export default function VoltModsApp() {
     const loadSupabase = async () => {
         if (typeof window !== 'undefined') {
             if ((window as any).supabase) { setSupabaseClient((window as any).supabase.createClient(supabaseUrl, supabaseKey)); return; }
+            // Używamy tego API, które Vercel akceptuje: https://cdn.jsdelivr.net/npm/@supabase/supabase-js
             const script = document.createElement('script');
-            script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+            script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"; 
             script.async = true;
-            script.onload = () => { if ((window as any).supabase) setSupabaseClient((window as any).supabase.createClient(supabaseUrl, supabaseKey)); };
+            script.onload = () => { 
+                // Klient Supabase jest dostępny globalnie jako 'supabase' po załadowaniu skryptu
+                if ((window as any).supabase) {
+                     setSupabaseClient((window as any).supabase.createClient(supabaseUrl, supabaseKey)); 
+                }
+            };
             document.body.appendChild(script);
         }
     };
@@ -320,7 +327,6 @@ export default function VoltModsApp() {
   });
 
   return (
-    // ZMIANA TŁA NA NOWOCZESNY GRADIENT I SIATKĘ
     <div className="min-h-screen bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(163,230,53,0.15),rgba(255,255,255,0))] text-white font-sans selection:bg-lime-400 selection:text-black overflow-x-hidden flex flex-col relative">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
       
