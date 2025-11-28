@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List } from 'lucide-react';
+import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List, CreditCard, Copy } from 'lucide-react';
 
 // UWAGA: IMPORT 'https://esm.sh/@supabase/supabase-js@2' ZOSTAŁ USUNIĘTY.
 
@@ -69,6 +69,15 @@ const AdminView = ({ onBack, supabase }) => {
 
         const slug = newProduct.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
+        // --- POPRAWKA CENY ---
+        const priceValue = parseFloat(newProduct.price.toString().replace(',', '.')); 
+        if (isNaN(priceValue)) {
+            alert("Wpisz poprawną cenę (użyj kropki lub przecinka jako separatora).");
+            setIsAdding(false);
+            return;
+        }
+        // -----------------------
+
         const { data: productData, error: productError } = await supabase
             .from('products')
             .insert([{
@@ -94,7 +103,7 @@ const AdminView = ({ onBack, supabase }) => {
             .insert([{
                 product_id: productData.id,
                 color: 'Standard',
-                price: parseFloat(newProduct.price),
+                price: priceValue,
                 stock: 1
             }]);
 
@@ -152,6 +161,7 @@ const AdminView = ({ onBack, supabase }) => {
                                         <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full ${order.status === 'NOWE' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-white/10 text-slate-400'}`}>{order.status}</span>
                                         <h3 className="text-xl font-bold text-white mt-3">{order.full_name}</h3>
                                         <p className="text-slate-400 text-sm font-mono mt-1">{order.address}</p>
+                                        <p className="text-slate-500 text-xs mt-1">{order.email} | {order.phone}</p>
                                     </div>
                                     <div className="text-right">
                                         <p className="text-3xl font-black text-lime-400">{order.total_price} <span className="text-sm text-lime-400/50">PLN</span></p>
@@ -278,12 +288,10 @@ export default function VoltModsApp() {
     const loadSupabase = async () => {
         if (typeof window !== 'undefined') {
             if ((window as any).supabase) { setSupabaseClient((window as any).supabase.createClient(supabaseUrl, supabaseKey)); return; }
-            // Używamy tego API, które Vercel akceptuje (dynamiczne ładowanie za pomocą skryptu)
             const script = document.createElement('script');
             script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"; 
             script.async = true;
             script.onload = () => { 
-                // Klient Supabase jest dostępny globalnie jako 'supabase' po załadowaniu skryptu
                 if ((window as any).supabase) {
                      setSupabaseClient((window as any).supabase.createClient(supabaseUrl, supabaseKey)); 
                 }
@@ -310,13 +318,17 @@ export default function VoltModsApp() {
   };
   const removeFromCart = (uniqueId) => setCart(cart.filter(item => item.uniqueId !== uniqueId));
   const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
     if (!supabaseClient) return;
     setIsSubmitting(true);
     const { error } = await supabaseClient.from('orders').insert([{ full_name: formData.fullName, email: formData.email, phone: formData.phone, address: `${formData.address}, ${formData.zip} ${formData.city}`, total_price: cart.reduce((t, i) => t + Number(i.price), 0), items: cart, status: 'NOWE' }]);
     setIsSubmitting(false);
-    if (error) alert("Błąd: " + error.message); else { setCartView('success'); setCart([]); }
+    if (error) alert("Błąd: " + error.message); else { 
+        setCartView('success'); 
+        setCart([]); // Wyczyść koszyk
+    }
   };
 
   const filteredProducts = products.filter(product => {
@@ -399,10 +411,52 @@ export default function VoltModsApp() {
                 <input required name="phone" placeholder="Telefon" onChange={handleInputChange} className="w-full bg-white/5 border border-white/10 rounded-lg p-4 text-sm focus:border-lime-400 focus:bg-black/50 outline-none transition-all placeholder-slate-600"/>
                 <input required name="address" placeholder="Ulica" onChange={handleInputChange} className="w-full bg-white/5 border border-white/10 rounded-lg p-4 text-sm focus:border-lime-400 focus:bg-black/50 outline-none transition-all placeholder-slate-600"/>
                 <div className="flex gap-2"><input required name="zip" placeholder="Kod" onChange={handleInputChange} className="w-1/3 bg-white/5 border border-white/10 rounded-lg p-4 text-sm focus:border-lime-400 focus:bg-black/50 outline-none transition-all placeholder-slate-600"/><input required name="city" placeholder="Miasto" onChange={handleInputChange} className="flex-1 bg-white/5 border border-white/10 rounded-lg p-4 text-sm focus:border-lime-400 focus:bg-black/50 outline-none transition-all placeholder-slate-600"/></div>
-                <button type="submit" disabled={isSubmitting} className="w-full bg-lime-400 text-black font-black py-4 uppercase tracking-widest hover:bg-lime-300 transition-all rounded-lg mt-auto shadow-[0_0_20px_rgba(163,230,53,0.2)]">{isSubmitting ? 'Przetwarzanie...' : 'Zamawiam'}</button>
+                <button type="submit" disabled={isSubmitting} className="w-full bg-lime-400 text-black font-black py-4 uppercase tracking-widest hover:bg-lime-300 transition-all rounded-lg mt-auto shadow-[0_0_20px_rgba(163,230,53,0.2)]">{isSubmitting ? 'Przetwarzanie...' : 'Zamawiam z Obowiązkiem Zapłaty'}</button>
             </form>
         )}
-        {cartView === 'success' && <div className="flex-1 flex flex-col items-center justify-center p-8 text-center"><div className="w-20 h-20 bg-lime-400/20 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(163,230,53,0.2)]"><CheckCircle size={40} className="text-lime-400"/></div><h2 className="text-3xl font-black text-white italic mb-2 tracking-tighter">GOTOWE!</h2><p className="text-slate-400 mb-8">Dzięki za zakupy w VMP.</p><button onClick={() => { setIsCartOpen(false); setCartView('items'); }} className="px-8 py-3 border border-lime-400 text-lime-400 font-bold uppercase hover:bg-lime-400 hover:text-black transition-all rounded-lg tracking-widest">Wróć</button></div>}
+        {cartView === 'success' && (
+            <div className="flex-1 flex flex-col items-center p-8 text-center overflow-y-auto">
+                <div className="w-20 h-20 bg-lime-400/20 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(163,230,53,0.2)]">
+                    <CheckCircle size={40} className="text-lime-400"/>
+                </div>
+                <h2 className="text-3xl font-black text-white italic mb-2 tracking-tighter">ZAMÓWIENIE PRZYJĘTE!</h2>
+                <p className="text-slate-400 mb-6 text-sm">Twoje części zostały zarezerwowane. Opłać zamówienie, abyśmy mogli wysłać paczkę.</p>
+                
+                {/* DANE DO PRZELEWU */}
+                <div className="w-full bg-white/5 border border-lime-400/30 rounded-xl p-6 mb-6 text-left relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-2 opacity-10"><CreditCard size={100} /></div>
+                    <h3 className="text-lime-400 font-bold uppercase tracking-widest mb-4 border-b border-white/10 pb-2">Dane do przelewu</h3>
+                    
+                    <div className="space-y-3 font-mono text-sm">
+                        <div>
+                            <span className="text-slate-500 block text-xs uppercase">Odbiorca:</span>
+                            <span className="text-white font-bold text-lg">Volt Mods Poland</span>
+                        </div>
+                        <div>
+                            <span className="text-slate-500 block text-xs uppercase">Numer konta:</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-lime-400 font-bold text-xl tracking-wider">PL 12 3456 7890 0000 0000 0000 0000</span>
+                                <button onClick={() => navigator.clipboard.writeText("12345678900000000000000000")} className="p-1 hover:text-white text-slate-500"><Copy size={14}/></button>
+                            </div>
+                        </div>
+                        <div>
+                            <span className="text-slate-500 block text-xs uppercase">Bank:</span>
+                            <span className="text-white">mBank S.A.</span>
+                        </div>
+                        <div>
+                            <span className="text-slate-500 block text-xs uppercase">Tytuł przelewu:</span>
+                            <span className="text-white">Zamówienie VMP (Twoje Imię i Nazwisko)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p className="text-xs text-slate-500 mb-8">Po zaksięgowaniu wpłaty wyślemy do Ciebie potwierdzenie oraz numer śledzenia paczki.</p>
+
+                <button onClick={() => { setIsCartOpen(false); setCartView('items'); }} className="w-full px-8 py-4 border border-lime-400 text-lime-400 font-bold uppercase hover:bg-lime-400 hover:text-black transition-all rounded-lg tracking-widest shadow-[0_0_20px_rgba(163,230,53,0.1)]">
+                    Wróć do sklepu
+                </button>
+            </div>
+        )}
       </div>
       {isCartOpen && <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm" onClick={() => setIsCartOpen(false)}></div>}
 
