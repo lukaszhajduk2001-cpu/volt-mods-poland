@@ -284,6 +284,7 @@ export default function VoltModsApp() {
   const [formData, setFormData] = useState({ fullName: '', email: '', phone: '', address: '', city: '', zip: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [supabaseClient, setSupabaseClient] = useState<any>(null);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
   
   const [activeCategory, setActiveCategory] = useState('ALL');
 
@@ -297,22 +298,23 @@ export default function VoltModsApp() {
       { id: 'akcesoria', label: 'AKCESORIA' }
   ];
 
+  // --- LOADER SUPABASE ---
   useEffect(() => {
-    const loadSupabase = async () => {
-        if (typeof window !== 'undefined') {
-            if ((window as any).supabase) { setSupabaseClient((window as any).supabase.createClient(supabaseUrl, supabaseKey)); return; }
-            const script = document.createElement('script');
-            script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"; 
-            script.async = true;
-            script.onload = () => { 
-                if ((window as any).supabase) {
-                     setSupabaseClient((window as any).supabase.createClient(supabaseUrl, supabaseKey)); 
-                }
-            };
-            document.body.appendChild(script);
-        }
+    const initSupabase = () => {
+         if ((window as any).supabase) {
+             setSupabaseClient((window as any).supabase.createClient(supabaseUrl, supabaseKey));
+         }
     };
-    loadSupabase();
+
+    if ((window as any).supabase) {
+        initSupabase();
+    } else {
+        const script = document.createElement('script');
+        script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"; 
+        script.async = true;
+        script.onload = initSupabase;
+        document.body.appendChild(script);
+    }
   }, []);
 
   useEffect(() => {
@@ -344,11 +346,27 @@ export default function VoltModsApp() {
     }
   };
 
+  const handleNewsletterSubmit = (e) => {
+      e.preventDefault();
+      alert(`Dziękujemy! Adres ${newsletterEmail} został dodany do listy VIP.`);
+      setNewsletterEmail('');
+  };
+
+  // --- POPRAWIONE FILTROWANIE ---
   const filteredProducts = products.filter(product => {
       if (activeCategory === 'ALL') return true;
-      const searchStr = (product.category || '' + product.name || '').toLowerCase();
-      const normalizedSearch = searchStr.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      return normalizedSearch.includes(activeCategory);
+      const prodCat = (product.category || '').toLowerCase();
+      const prodName = (product.name || '').toLowerCase();
+      const target = activeCategory.toLowerCase();
+
+      // 1. Sprawdź czy kategoria w bazie pasuje do wybranej
+      if (prodCat === target) return true;
+      if (prodCat.includes(target)) return true; 
+
+      // 2. Jeśli produkt nie ma kategorii, sprawdź czy nazwa zawiera słowo kluczowe
+      if (!product.category && prodName.includes(target)) return true;
+
+      return false;
   });
 
   return (
@@ -509,7 +527,6 @@ export default function VoltModsApp() {
             {/* SEKCJA PERFORMANCE CORE (MOC) */}
             <div className="mb-24 relative overflow-hidden rounded-[40px] bg-black border border-white/10 animate-in slide-in-from-bottom-10 fade-in duration-1000 delay-200">
                 <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent z-10"></div>
-                {/* Tutaj normalnie byłby obraz baterii w tle */}
                 <div className="absolute right-0 top-0 h-full w-1/2 bg-lime-900/20 blur-3xl"></div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 p-10 md:p-20 relative z-20 items-center">
@@ -609,10 +626,10 @@ export default function VoltModsApp() {
                     <Mail size={48} className="mx-auto mb-6 text-black"/>
                     <h2 className="text-4xl md:text-5xl font-black text-black italic tracking-tighter mb-4">DOŁĄCZ DO ELITY.</h2>
                     <p className="text-black/70 text-lg font-medium mb-8">Bądź pierwszy przy dropach limitowanych części i kodach rabatowych. Zero spamu, sama esencja.</p>
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <input placeholder="Twój email" className="flex-1 bg-white border-0 rounded-xl p-5 text-black placeholder-black/40 font-bold outline-none ring-4 ring-transparent focus:ring-black/20 transition-all"/>
-                        <button className="bg-black text-white px-10 py-5 rounded-xl font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-xl">Zapisz Mnie</button>
-                    </div>
+                    <form onSubmit={handleNewsletterSubmit} className="flex flex-col md:flex-row gap-4">
+                        <input type="email" required placeholder="Twój email" value={newsletterEmail} onChange={(e) => setNewsletterEmail(e.target.value)} className="flex-1 bg-white border-0 rounded-xl p-5 text-black placeholder-black/40 font-bold outline-none ring-4 ring-transparent focus:ring-black/20 transition-all"/>
+                        <button type="submit" className="bg-black text-white px-10 py-5 rounded-xl font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-xl">Zapisz Mnie</button>
+                    </form>
                  </div>
             </div>
           </>
