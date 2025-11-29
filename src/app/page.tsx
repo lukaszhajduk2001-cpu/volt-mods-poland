@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List, CreditCard, Copy, Star, Zap, Battery, Cpu, ShieldCheck, Truck, Award, Mail, User } from 'lucide-react';
+import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List, CreditCard, Copy, Star, Zap, Battery, Cpu, ShieldCheck, Truck, Mail, User } from 'lucide-react';
 
 // KONFIGURACJA ZMIENNYCH
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
