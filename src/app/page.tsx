@@ -1,19 +1,25 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List, CreditCard, Copy, Star, Zap } from 'lucide-react';
+import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List, CreditCard, Copy, Star, Zap, Battery, Cpu, ShieldCheck, Truck, Award, Mail } from 'lucide-react';
 
-// UWAGA: IMPORT Z URL ZOSTAŁ USUNIĘTY DLA ZGODNOŚCI Z VERCEL.
+// UWAGA: IMPORT Z URL ZOSTAŁ USUNIĘTY - KOD ZGODNY Z VERCEL.
 
 // --- 1. KONFIGURACJA ZMIENNYCH ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// --- DANE DO OPINII (SOCIAL PROOF) ---
+// --- DANE (SOCIAL PROOF) ---
 const TESTIMONIALS = [
     { id: 1, name: "Marek 'SurRon' K.", text: "Sterownik robi robotę! Mój Sur-Ron w końcu lata na koło jak wściekły. Paczka w 24h.", rating: 5 },
-    { id: 2, name: "Patryk W.", text: "Zamawiałem koła 16 cali. Jakość wykonania top. Kontakt ze sklepem wzorowy.", rating: 5 },
-    { id: 3, name: "Kacper S.", text: "Najlepszy sklep z częściami w PL. Ceny uczciwe, a nie z kosmosu jak u konkurencji.", rating: 5 },
+    { id: 2, name: "Patryk W.", text: "Bateria 72V zmieniła ten rower w potwora. Zasięg x2, moc x3. Polecam!", rating: 5 },
+    { id: 3, name: "Kacper S.", text: "Najlepszy sklep z częściami w PL. Ceny uczciwe, jakość premium.", rating: 5 },
+];
+
+const FEATURES = [
+    { icon: <ShieldCheck size={32} />, title: "JAKOŚĆ PREMIUM", desc: "Tylko sprawdzone części. Aluminium lotnicze 7075 i markowe ogniwa." },
+    { icon: <Zap size={32} />, title: "CZYSTA MOC", desc: "Podzespoły testowane pod obciążeniem. Gwarancja przyrostu osiągów." },
+    { icon: <Truck size={32} />, title: "WYSYŁKA 24H", desc: "Wiemy, że chcesz już jeździć. Zamówienia wysyłamy błyskawicznie." },
 ];
 
 // --- 2. KOMPONENTY WIDOKÓW ---
@@ -75,7 +81,7 @@ const AdminView = ({ onBack, supabase }) => {
 
         const slug = newProduct.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
-        // --- POPRAWKA CENY ---
+        // --- FIX CENY ---
         const priceValue = parseFloat(newProduct.price.toString().replace(',', '.')); 
         if (isNaN(priceValue)) {
             alert("Wpisz poprawną cenę (użyj kropki lub przecinka jako separatora).");
@@ -195,7 +201,7 @@ const AdminView = ({ onBack, supabase }) => {
                                     <option value="podnozki">PODNÓŻKI</option>
                                     <option value="baterie">BATERIE</option>
                                     <option value="kontrolery">KONTROLERY</option>
-                                    <option value="opony">OPONY I KOŁA</option>
+                                    <option value="silniki">SILNIKI</option>
                                     <option value="akcesoria">AKCESORIA</option>
                                 </select>
                             </div>
@@ -287,7 +293,7 @@ export default function VoltModsApp() {
       { id: 'podnozki', label: 'PODNÓŻKI' },
       { id: 'baterie', label: 'BATERIE' },
       { id: 'kontrolery', label: 'KONTROLERY' },
-      { id: 'opony', label: 'OPONY I KOŁA' },
+      { id: 'silniki', label: 'SILNIKI' },
       { id: 'akcesoria', label: 'AKCESORIA' }
   ];
 
@@ -470,46 +476,81 @@ export default function VoltModsApp() {
       <main className="container mx-auto px-4 py-12 flex-1 relative z-10">
         {view === 'admin' ? <AdminView onBack={() => setView('home')} supabase={supabaseClient}/> : view === 'home' ? (
           <>
-            <div className="relative overflow-hidden bg-gradient-to-br from-white/5 to-transparent border border-white/10 p-10 md:p-20 mb-16 rounded-3xl shadow-2xl group animate-in slide-in-from-bottom-10 fade-in duration-700">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-lime-400/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-lime-400/30 transition-all duration-1000"></div>
+            {/* HERO SECTION PREMIUM */}
+            <div className="relative overflow-hidden bg-neutral-900 border border-white/5 p-10 md:p-24 mb-16 rounded-[40px] shadow-2xl group animate-in slide-in-from-bottom-10 fade-in duration-700">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-lime-400/10 rounded-full blur-[120px] -translate-y-1/3 translate-x-1/3 group-hover:bg-lime-400/20 transition-all duration-1000"></div>
                 <div className="relative z-10">
-                    <h1 className="text-5xl md:text-8xl font-black italic text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-500 mb-4 tracking-tighter drop-shadow-lg">
-                        STWÓRZ <span className="text-lime-400">BESTIĘ</span>
+                    <div className="inline-block px-4 py-1 mb-6 border border-lime-400/30 rounded-full bg-lime-400/10 backdrop-blur-sm">
+                        <span className="text-lime-400 text-xs font-black uppercase tracking-[0.2em]">High Voltage Engineering</span>
+                    </div>
+                    <h1 className="text-5xl md:text-8xl font-black italic text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-500 mb-6 tracking-tighter drop-shadow-xl leading-[0.9]">
+                        ZBUDUJ <br/><span className="text-lime-400">LEGENDĘ.</span>
                     </h1>
-                    <p className="text-slate-400 text-lg md:text-2xl font-light tracking-wide max-w-2xl border-l-4 border-lime-400 pl-6">
-                        Premium części i modyfikacje do <strong className="text-white">Sur-Ron</strong> oraz <strong className="text-white">Talaria</strong>. Zbuduj maszynę marzeń.
+                    <p className="text-slate-400 text-lg md:text-2xl font-light tracking-wide max-w-2xl border-l-4 border-lime-400 pl-8 leading-relaxed">
+                        Nie szukaj kompromisów. VMP dostarcza <strong className="text-white">części premium</strong> do Sur-Ron i Talaria, które zmieniają zasady gry.
                     </p>
                 </div>
             </div>
 
-            {/* NOWA SEKCJA: GRIP MASTERY (OPONY) */}
-            <div className="mb-24 relative overflow-hidden rounded-3xl bg-neutral-900 border border-white/5 animate-in slide-in-from-bottom-10 fade-in duration-1000 delay-200">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-30"></div>
-                <div className="absolute -left-20 -bottom-20 w-96 h-96 bg-lime-400/10 rounded-full blur-[80px]"></div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 p-10 md:p-16 relative z-10 items-center">
-                    <div>
-                        <div className="inline-flex items-center gap-2 text-lime-400 font-bold uppercase tracking-widest text-xs mb-4 border border-lime-400/30 px-3 py-1 rounded-full bg-lime-400/10">
-                            <Zap size={14} fill="currentColor"/> Grip Mastery
+            {/* SEKCJA VMP ENGINEERING (DLACZEGO MY) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+                {FEATURES.map((feature, i) => (
+                    <div key={i} className="bg-white/5 border border-white/5 p-8 rounded-3xl hover:bg-white/10 transition-colors group">
+                        <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center text-lime-400 mb-6 group-hover:scale-110 transition-transform shadow-[0_0_20px_rgba(163,230,53,0.1)] border border-white/10">
+                            {feature.icon}
                         </div>
-                        <h2 className="text-4xl md:text-6xl font-black italic text-white mb-6 leading-none">PRZYCZEPNOŚĆ <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-500">TO KONTROLA.</span></h2>
-                        <p className="text-slate-400 text-lg mb-8 leading-relaxed">
-                            Oryginalne opony to ślizgawka? Zmień to. Oferujemy zestawy kół 19/16" oraz opony enduro, które wgryzają się w teren.
-                        </p>
-                        <button onClick={() => setActiveCategory('opony')} className="bg-white text-black px-8 py-4 font-black uppercase tracking-widest hover:bg-lime-400 transition-all rounded-lg shadow-lg hover:shadow-lime-400/50">
-                            Zobacz Opony i Koła
-                        </button>
+                        <h3 className="text-xl font-black text-white uppercase tracking-wider mb-2">{feature.title}</h3>
+                        <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
                     </div>
-                    <div className="relative h-64 md:h-96 flex items-center justify-center">
-                         {/* Placeholder na grafikę koła/opony - używam ikony dla demo, w produkcji tutaj byłoby zdjęcie */}
-                         <div className="w-64 h-64 md:w-80 md:h-80 rounded-full border-4 border-dashed border-lime-400/30 flex items-center justify-center animate-[spin_10s_linear_infinite]">
-                            <div className="w-56 h-56 md:w-72 md:h-72 rounded-full border-2 border-white/10 bg-black/50 flex items-center justify-center">
-                                <RefreshCw size={80} className="text-lime-400 opacity-50"/>
+                ))}
+            </div>
+
+            {/* SEKCJA PERFORMANCE CORE (MOC) */}
+            <div className="mb-24 relative overflow-hidden rounded-[40px] bg-black border border-white/10 animate-in slide-in-from-bottom-10 fade-in duration-1000 delay-200">
+                <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent z-10"></div>
+                {/* Tutaj normalnie byłby obraz baterii w tle */}
+                <div className="absolute right-0 top-0 h-full w-1/2 bg-lime-900/20 blur-3xl"></div>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 p-10 md:p-20 relative z-20 items-center">
+                    <div>
+                        <div className="inline-flex items-center gap-2 text-lime-400 font-bold uppercase tracking-widest text-xs mb-4">
+                            <Zap size={14} fill="currentColor"/> Performance Core
+                        </div>
+                        <h2 className="text-4xl md:text-6xl font-black italic text-white mb-6 leading-none">CZYSTA <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-500">MOC.</span></h2>
+                        <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                            Fabryczna moc to dopiero początek. Odkryj sterowniki wektorowe i baterie 72V na ogniwach Molicel, które wyrywają z butów.
+                        </p>
+                        <div className="flex gap-4">
+                            <button onClick={() => setActiveCategory('baterie')} className="bg-lime-400 text-black px-8 py-4 font-black uppercase tracking-widest hover:bg-white transition-all rounded-xl shadow-[0_0_20px_rgba(163,230,53,0.3)]">
+                                Baterie
+                            </button>
+                            <button onClick={() => setActiveCategory('kontrolery')} className="bg-transparent border border-white/20 text-white px-8 py-4 font-black uppercase tracking-widest hover:bg-white/10 transition-all rounded-xl">
+                                Sterowniki
+                            </button>
+                        </div>
+                    </div>
+                    <div className="relative h-64 md:h-80 flex items-center justify-center">
+                         <div className="w-full max-w-sm bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-3xl transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                            <div className="flex justify-between items-start mb-8">
+                                <Cpu size={48} className="text-lime-400"/>
+                                <span className="text-xs font-mono text-slate-500">VMP-CTRL-X9000</span>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="h-2 bg-white/10 rounded-full w-3/4"></div>
+                                <div className="h-2 bg-white/10 rounded-full w-1/2"></div>
+                                <div className="h-2 bg-white/10 rounded-full w-full"></div>
+                            </div>
+                            <div className="mt-8 pt-8 border-t border-white/10 flex justify-between items-center">
+                                <span className="text-white font-bold">TORP / KO</span>
+                                <span className="text-lime-400 font-mono text-xl">+400% POWER</span>
                             </div>
                          </div>
                     </div>
                 </div>
             </div>
             
+            {/* KATEGORIE I PRODUKTY */}
             <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-4">
                 <h2 className="text-3xl font-black flex items-center gap-3 tracking-tighter">
                     <span className="text-lime-400 text-4xl">⚡</span> 
@@ -518,53 +559,78 @@ export default function VoltModsApp() {
                 {activeCategory !== 'ALL' && <span className="bg-lime-400 text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-[0_0_10px_rgba(163,230,53,0.5)]">Filtr Aktywny</span>}
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-32">
                 {!supabaseClient ? <div className="col-span-4 text-center py-32 text-lime-400 flex flex-col items-center animate-pulse"><RefreshCw className="animate-spin mb-4" size={32}/>Łączenie z bazą VMP...</div> : filteredProducts.length === 0 ? <p className="col-span-4 text-slate-500 text-center py-20 border border-dashed border-white/10 rounded-2xl">Brak sprzętu w tej kategorii. Dodaj go w Adminie!</p> : filteredProducts.map((product) => (
-                    <div key={product.id} onClick={() => handleProductClick(product)} className="group bg-white/5 border border-white/5 hover:border-lime-400/50 hover:bg-black/60 backdrop-blur-sm transition-all duration-300 p-5 relative overflow-hidden transform hover:-translate-y-2 rounded-2xl cursor-pointer flex flex-col shadow-lg hover:shadow-[0_0_30px_rgba(163,230,53,0.15)] animate-in fade-in zoom-in duration-500">
-                        <div className="relative aspect-square w-full overflow-hidden mb-5 rounded-xl bg-black/40 border border-white/5">
+                    <div key={product.id} onClick={() => handleProductClick(product)} className="group bg-neutral-900 border border-white/5 hover:border-lime-400/50 hover:bg-black transition-all duration-300 p-5 relative overflow-hidden transform hover:-translate-y-2 rounded-3xl cursor-pointer flex flex-col shadow-lg hover:shadow-[0_0_30px_rgba(163,230,53,0.15)] animate-in fade-in zoom-in duration-500">
+                        <div className="relative aspect-square w-full overflow-hidden mb-5 rounded-2xl bg-black/40 border border-white/5">
                             {product.image_url ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" /> : <div className="w-full h-full flex items-center justify-center text-slate-700"><Bike size={48} /></div>}
-                            <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold text-lime-400 border border-lime-400/30 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider">Zobacz</div>
+                            <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-lime-400 border border-lime-400/30 opacity-0 group-hover:opacity-100 transition-opacity uppercase tracking-wider">Zobacz</div>
                         </div>
                         <h3 className="text-lg font-black text-white tracking-wide mb-2 uppercase leading-tight group-hover:text-lime-400 transition-colors">{product.name}</h3>
-                        <div className="mt-auto flex justify-between items-end border-t border-white/10 pt-4">
+                        <div className="mt-auto flex justify-between items-end border-t border-white/5 pt-4">
                             <span className="font-mono text-xl text-white font-bold">{product.product_variants?.[0]?.price || '???'} <span className="text-xs text-slate-500">PLN</span></span>
-                            <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-lime-400 group-hover:text-black transition-colors">
-                                <Plus size={16}/>
+                            <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-lime-400 group-hover:text-black transition-colors border border-white/5 group-hover:border-lime-400">
+                                <Plus size={18}/>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* NOWA SEKCJA: GARAŻ VMP (OPINIE) */}
-            <div className="border-t border-white/10 pt-16 mb-16">
-                 <h2 className="text-3xl font-black text-center mb-12 italic tracking-tighter text-white">GARAŻ <span className="text-lime-400">VMP</span></h2>
+            {/* SEKCJA GARAŻ VMP (OPINIE) */}
+            <div className="border-t border-white/10 pt-24 mb-24">
+                 <div className="text-center mb-16">
+                     <span className="text-lime-400 text-xs font-black uppercase tracking-[0.2em] mb-4 block">Trusted by Riders</span>
+                     <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter text-white">GARAŻ <span className="text-lime-400">VMP</span></h2>
+                 </div>
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {TESTIMONIALS.map((review, i) => (
-                        <div key={review.id} className="bg-white/5 p-8 rounded-2xl border border-white/5 hover:border-lime-400/30 transition-all hover:-translate-y-1 relative group">
-                             <div className="text-lime-400 flex gap-1 mb-4">
-                                {[...Array(review.rating)].map((_, i) => <Star key={i} size={16} fill="currentColor"/>)}
+                        <div key={review.id} className="bg-neutral-900 p-10 rounded-[32px] border border-white/5 hover:border-lime-400/30 transition-all hover:-translate-y-2 relative group shadow-2xl">
+                             <div className="text-lime-400 flex gap-1 mb-6">
+                                {[...Array(review.rating)].map((_, i) => <Star key={i} size={18} fill="currentColor"/>)}
                              </div>
-                             <p className="text-slate-300 italic mb-6">"{review.text}"</p>
-                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-black rounded-full flex items-center justify-center font-bold text-xs text-lime-400 border border-white/10">{review.name.charAt(0)}</div>
-                                <span className="font-bold text-sm text-white uppercase tracking-wide">{review.name}</span>
+                             <p className="text-slate-300 text-lg leading-relaxed mb-8">"{review.text}"</p>
+                             <div className="flex items-center gap-4 border-t border-white/5 pt-6">
+                                <div className="w-12 h-12 bg-gradient-to-br from-neutral-800 to-black rounded-full flex items-center justify-center font-black text-lime-400 border border-white/10 shadow-inner">{review.name.charAt(0)}</div>
+                                <div>
+                                    <span className="font-bold text-white uppercase tracking-wide block">{review.name}</span>
+                                    <span className="text-xs text-slate-500 uppercase tracking-widest">Zweryfikowany Klient</span>
+                                </div>
                              </div>
-                             <div className="absolute top-0 right-0 w-20 h-20 bg-lime-400/5 rounded-bl-full rounded-tr-2xl group-hover:bg-lime-400/10 transition-colors"></div>
                         </div>
                     ))}
+                 </div>
+            </div>
+
+            {/* NEWSLETTER */}
+            <div className="bg-lime-400 rounded-[40px] p-10 md:p-20 text-center relative overflow-hidden mb-12 shadow-[0_0_100px_rgba(163,230,53,0.15)]">
+                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-multiply"></div>
+                 <div className="relative z-10 max-w-2xl mx-auto">
+                    <Mail size={48} className="mx-auto mb-6 text-black"/>
+                    <h2 className="text-4xl md:text-5xl font-black text-black italic tracking-tighter mb-4">DOŁĄCZ DO ELITY.</h2>
+                    <p className="text-black/70 text-lg font-medium mb-8">Bądź pierwszy przy dropach limitowanych części i kodach rabatowych. Zero spamu, sama esencja.</p>
+                    <div className="flex flex-col md:flex-row gap-4">
+                        <input placeholder="Twój email" className="flex-1 bg-white border-0 rounded-xl p-5 text-black placeholder-black/40 font-bold outline-none ring-4 ring-transparent focus:ring-black/20 transition-all"/>
+                        <button className="bg-black text-white px-10 py-5 rounded-xl font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-xl">Zapisz Mnie</button>
+                    </div>
                  </div>
             </div>
           </>
         ) : <ProductDetailView product={activeProduct} onBack={() => setView('home')} onAddToCart={(p, v) => { addToCart(p, v); setView('home'); }} />}
       </main>
 
-      <footer className="border-t border-white/10 py-12 text-center relative z-10 bg-black/40 backdrop-blur-lg mt-12">
-        <div className="flex flex-col items-center justify-center gap-4">
-            <div className="w-10 h-10 bg-lime-400 text-slate-950 font-black flex items-center justify-center text-xs -skew-x-10 border-2 border-lime-400 shadow-[0_0_15px_rgba(163,230,53,0.3)]">VMP</div>
-            <span className="text-slate-500 text-xs font-bold uppercase tracking-[0.2em]">Volt Mods Poland © 2025</span>
+      <footer className="border-t border-white/10 py-16 text-center relative z-10 bg-black mt-12">
+        <div className="flex flex-col items-center justify-center gap-6">
+            <div className="w-16 h-16 bg-lime-400 text-slate-950 font-black flex items-center justify-center text-sm -skew-x-10 border-4 border-lime-400 shadow-[0_0_30px_rgba(163,230,53,0.4)] transform hover:rotate-12 transition-transform duration-500">VMP</div>
+            <div className="text-white font-black italic text-2xl tracking-tighter">VOLT MODS <span className="text-lime-400">POLAND</span></div>
+            <div className="flex gap-8 text-slate-500 text-xs font-bold uppercase tracking-[0.2em] mt-4">
+                <a href="#" className="hover:text-lime-400 transition-colors">Regulamin</a>
+                <a href="#" className="hover:text-lime-400 transition-colors">Dostawa</a>
+                <a href="#" className="hover:text-lime-400 transition-colors">Kontakt</a>
+            </div>
+            <span className="text-slate-600 text-xs mt-8">© 2025 VMP Engineering. All rights reserved.</span>
         </div>
-        <button onClick={() => setView('admin')} className="absolute bottom-4 right-4 opacity-10 hover:opacity-100 transition-opacity p-2" title="Panel Administratora"><Lock size={14} className="text-lime-400"/></button>
+        <button onClick={() => setView('admin')} className="absolute bottom-4 right-4 opacity-5 hover:opacity-100 transition-opacity p-2" title="Panel Administratora"><Lock size={14} className="text-lime-400"/></button>
       </footer>
     </div>
   );
