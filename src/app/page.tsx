@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List, CreditCard, Copy, Star, Zap, Battery, Cpu, ShieldCheck, Truck, Mail, User } from 'lucide-react';
+import { ShoppingBag, Menu, Bike, CheckCircle, Trash2, X, ChevronLeft, ArrowLeft, Lock, RefreshCw, Plus, List, CreditCard, Copy, Star, Zap, Battery, Cpu, ShieldCheck, Truck, Mail, User, MapPin, Phone, MessageSquare } from 'lucide-react';
 
 // KONFIGURACJA ZMIENNYCH
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -202,6 +202,7 @@ export default function VoltModsApp() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [supabaseClient, setSupabaseClient] = useState<any>(null);
   const [activeCategory, setActiveCategory] = useState('ALL');
+  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
 
   const CATEGORIES = [
       { id: 'ALL', label: 'WSZYSTKIE' },
@@ -238,6 +239,12 @@ export default function VoltModsApp() {
     setIsSubmitting(true);
     await supabaseClient.from('orders').insert([{ full_name: formData.fullName, email: formData.email, phone: formData.phone, address: `${formData.address}, ${formData.zip} ${formData.city}`, total_price: cart.reduce((t, i) => t + Number(i.price), 0), items: cart, status: 'NOWE' }]);
     setIsSubmitting(false); setCartView('success'); setCart([]);
+  };
+
+  const handleSubmitContact = (e) => {
+      e.preventDefault();
+      alert(`Dziękujemy ${contactForm.name}! Otrzymaliśmy Twoją wiadomość i odpiszemy w ciągu 24 godzin.`);
+      setContactForm({ name: '', email: '', message: '' });
   };
 
   const filteredProducts = products.filter(product => {
@@ -295,7 +302,7 @@ export default function VoltModsApp() {
       <main className="container mx-auto px-4 py-12 flex-1 relative z-10">
         {view === 'admin' ? <AdminView onBack={() => setView('home')} supabase={supabaseClient}/> : view === 'home' ? (
           <>
-            {/* 1. SEKCJE INTRO - WIDOCZNE TYLKO NA STRONIE GŁÓWNEJ ('WSZYSTKIE') */}
+            {/* SEKCJE INTRO - WIDOCZNE TYLKO NA STRONIE GŁÓWNEJ ('WSZYSTKIE') */}
             {isHomePage && (
                 <>
                     {/* HERO */}
@@ -350,7 +357,40 @@ export default function VoltModsApp() {
                 </>
             )}
 
-            {/* 2. NAGŁÓWEK I LISTA PRODUKTÓW (WIDOCZNE ZAWSZE, ALE ZMIENIA SIĘ POŁOŻENIE) */}
+            {/* SEKCJA KONTAKT */}
+            <div className={`mb-24 ${isCategoryView ? 'hidden' : ''}`}>
+                <div className="text-center mb-12"><span className="text-lime-400 text-xs font-black uppercase tracking-[0.2em]">Masz Pytania?</span><h2 className="text-4xl md:text-5xl font-black italic text-white">KONTAKT <span className="text-lime-400">VMP</span></h2></div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white/5 border border-white/10 rounded-[40px] p-8 md:p-12 shadow-xl">
+                    
+                    {/* LEWA STRONA: FORMULARZ */}
+                    <div>
+                        <h3 className="text-2xl font-black text-white mb-6 flex items-center gap-3"><MessageSquare size={20} className="text-lime-400"/> WYŚLIJ WIADOMOŚĆ</h3>
+                        <form onSubmit={handleSubmitContact} className="space-y-4">
+                            <input required type="text" placeholder="Imię lub Nick" value={contactForm.name} onChange={(e) => setContactForm({...contactForm, name: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-lime-400 outline-none transition-all"/>
+                            <input required type="email" placeholder="Adres Email" value={contactForm.email} onChange={(e) => setContactForm({...contactForm, email: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-lime-400 outline-none transition-all"/>
+                            <textarea required placeholder="Treść Wiadomości" rows={5} value={contactForm.message} onChange={(e) => setContactForm({...contactForm, message: e.target.value})} className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-sm text-white focus:border-lime-400 outline-none transition-all"/>
+                            <button type="submit" className="w-full bg-lime-400 text-black font-black py-4 uppercase tracking-widest hover:bg-lime-300 transition-all rounded-xl">Wyślij do Działu Tech.</button>
+                        </form>
+                    </div>
+
+                    {/* PRAWA STRONA: MAPA I INFO */}
+                    <div className="flex flex-col">
+                        <div className="h-64 rounded-xl overflow-hidden mb-6 border-4 border-white/10 shadow-lg relative">
+                            <img src="https://images.unsplash.com/photo-1557962453-2947118b6256?q=80&w=1000" alt="Lokalizacja VMP" className="w-full h-full object-cover grayscale opacity-70"/>
+                            <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-black/30">
+                                <MapPin size={48} className="text-lime-400 animate-bounce"/>
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                             <div className="flex items-center gap-3"><Mail size={20} className="text-lime-400"/><span className="text-slate-300 font-bold">techsupport@vmp.pl</span></div>
+                             <div className="flex items-center gap-3"><Phone size={20} className="text-lime-400"/><span className="text-slate-300 font-bold">+48 700 700 700 (pn-pt 9:00-17:00)</span></div>
+                             <div className="flex items-center gap-3"><MapPin size={20} className="text-lime-400"/><span className="text-slate-300">UL. ELEKTRONOWA 21, 00-999 WARSZAWA</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* NAGŁÓWEK I LISTA PRODUKTÓW */}
             <div className={`flex items-center justify-between mb-8 border-b border-white/10 pb-4 ${isCategoryView ? 'mt-0' : 'mt-16'}`}>
                 <h2 className="text-3xl font-black flex items-center gap-3">
                     <span className="text-lime-400 text-4xl">⚡</span> 
@@ -360,7 +400,7 @@ export default function VoltModsApp() {
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-32">
-                {!supabaseClient ? <div className="col-span-4 text-center py-20 text-lime-400 animate-pulse">Łączenie z bazą...</div> : filteredProducts.length === 0 ? <p className="col-span-4 text-center py-20 text-slate-500 border border-dashed border-white/10 rounded-2xl">Brak produktów.</p> : filteredProducts.map(p => (
+                {!supabaseClient ? <div className="col-span-4 text-center py-20 text-lime-400 animate-pulse">Ładowanie z Supabase...</div> : filteredProducts.length === 0 ? <p className="col-span-4 text-center py-20 text-slate-500 border border-dashed border-white/10 rounded-2xl">Brak produktów.</p> : filteredProducts.map(p => (
                     <div key={p.id} onClick={() => { setActiveProduct(p); setView('product'); window.scrollTo(0,0); }} className="group bg-neutral-900 border border-white/5 p-4 rounded-3xl cursor-pointer hover:-translate-y-2 transition-transform hover:border-lime-400/50 hover:bg-black">
                         <div className="relative aspect-square w-full rounded-2xl bg-black/40 mb-4 overflow-hidden">{p.image_url ? <img src={p.image_url} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"/> : <Bike className="m-auto text-slate-700 w-1/2 h-1/2"/>}</div>
                         <h3 className="font-black text-white text-lg uppercase leading-tight mb-2 group-hover:text-lime-400 transition-colors">{p.name}</h3>
@@ -369,7 +409,7 @@ export default function VoltModsApp() {
                 ))}
             </div>
 
-            {/* REVIEWS & NEWSLETTER - BEZ GALERII */}
+            {/* REVIEWS & NEWSLETTER - BEZ ZMIAN */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-white/10 pt-16">
                  <div>
                      <h3 className="text-2xl font-black italic mb-6">OPINIE</h3>
@@ -408,8 +448,8 @@ export default function VoltModsApp() {
         <p className="text-slate-600 text-xs mb-6">Volt Mods Poland © 2025</p>
         <div className="flex justify-center gap-6 text-xs font-bold uppercase text-slate-500">
             <a href="/regulamin" className="hover:text-lime-400 transition-colors">Regulamin</a>
-            <span className="cursor-pointer hover:text-lime-400 transition-colors">Dostawa</span>
-            <span className="cursor-pointer hover:text-lime-400 transition-colors">Kontakt</span>
+            <a href="/dostawa" className="hover:text-lime-400 transition-colors">Dostawa</a>
+            <a href="/kontakt" className="hover:text-lime-400 transition-colors">Kontakt</a>
         </div>
         <button onClick={() => setView('admin')} className="absolute bottom-4 right-4 opacity-10 hover:opacity-100 p-2"><Lock size={14}/></button>
       </footer>
