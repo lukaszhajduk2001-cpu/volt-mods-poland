@@ -244,8 +244,21 @@ export default function VoltModsApp() {
       if (activeCategory === 'ALL') return true;
       const cat = (product.category || '').toLowerCase();
       const target = activeCategory.toLowerCase();
+      // Inteligentne filtrowanie: pasuje dokładnie LUB zawiera słowo kluczowe
       return cat === target || cat.includes(target) || (!product.category && (product.name || '').toLowerCase().includes(target));
   });
+
+  // Włączamy skrolowanie na górę, aby zasymulować nową stronę po kliknięciu kategorii
+  useEffect(() => {
+    if (view === 'home' && activeCategory !== 'ALL') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [activeCategory, view]);
+
+
+  const isHomePage = view === 'home' && activeCategory === 'ALL';
+  const isCategoryView = view === 'home' && activeCategory !== 'ALL';
+
 
   return (
     <div className="min-h-screen bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(163,230,53,0.15),rgba(255,255,255,0))] text-white font-sans selection:bg-lime-400 selection:text-black overflow-x-hidden flex flex-col relative">
@@ -269,7 +282,7 @@ export default function VoltModsApp() {
       {/* MOBILE MENU */}
       {isMenuOpen && (<div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl p-8 flex flex-col gap-6 items-center justify-center animate-in fade-in"><button onClick={() => setIsMenuOpen(false)} className="absolute top-6 right-6 text-lime-400 p-2"><X size={32}/></button>{CATEGORIES.map(cat => (<button key={cat.id} onClick={() => { setActiveCategory(cat.id); setIsMenuOpen(false); setView('home'); }} className={`text-2xl font-black uppercase ${activeCategory === cat.id ? 'text-lime-400' : 'text-white/50'}`}>{cat.label}</button>))}</div>)}
 
-      {/* KOSZYK */}
+      {/* KOSZYK - BEZ ZMIAN */}
       <div className={`fixed inset-y-0 right-0 z-[60] w-full sm:w-[450px] bg-black/95 border-l border-white/10 shadow-2xl transform transition-transform duration-500 ${isCartOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
         <div className="p-6 border-b border-white/10 flex justify-between items-center">{cartView === 'checkout' ? <button onClick={() => setCartView('items')} className="text-slate-400 hover:text-white flex items-center gap-1 uppercase font-bold text-xs"><ChevronLeft size={14}/> Wróć</button> : <h2 className="text-2xl font-black italic">KOSZYK</h2>}<button onClick={() => setIsCartOpen(false)}><X size={24} className="text-slate-400 hover:text-white"/></button></div>
         {cartView === 'items' && <div className="flex-1 flex flex-col p-6 overflow-y-auto">{cart.length === 0 ? <div className="text-center text-slate-500 mt-10">Pusto...</div> : cart.map(item => (<div key={item.uniqueId} className="flex gap-4 bg-white/5 p-3 rounded-xl mb-3 items-center"><img src={item.image} className="w-12 h-12 rounded object-cover"/><div className="flex-1"><h4 className="font-bold text-sm">{item.name}</h4><p className="text-lime-400 text-xs">{item.price} PLN</p></div><button onClick={() => setCart(cart.filter(c => c.uniqueId !== item.uniqueId))} className="text-slate-500 hover:text-red-500"><Trash2 size={16}/></button></div>))}{cart.length > 0 && <div className="mt-auto pt-6 border-t border-white/10"><div className="flex justify-between items-end mb-4"><span className="text-slate-400 uppercase text-xs font-bold">Suma</span><span className="text-3xl font-black text-lime-400">{cart.reduce((t, i) => t + Number(i.price), 0)} PLN</span></div><button onClick={() => setCartView('checkout')} className="w-full bg-lime-400 text-black py-4 font-black uppercase rounded-lg hover:bg-lime-300">Przejdź do płatności</button></div>}</div>}
@@ -282,24 +295,70 @@ export default function VoltModsApp() {
       <main className="container mx-auto px-4 py-12 flex-1 relative z-10">
         {view === 'admin' ? <AdminView onBack={() => setView('home')} supabase={supabaseClient}/> : view === 'home' ? (
           <>
-            {/* HERO */}
-            <div className="relative bg-neutral-900 border border-white/5 p-10 md:p-24 mb-16 rounded-[40px] shadow-2xl overflow-hidden group">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-lime-400/10 rounded-full blur-[100px] group-hover:bg-lime-400/20 transition-all duration-1000"></div>
-                <div className="relative z-10">
-                    <span className="inline-block px-3 py-1 mb-6 border border-lime-400/30 rounded-full bg-lime-400/10 text-lime-400 text-xs font-black uppercase tracking-widest">High Voltage Engineering</span>
-                    <h1 className="text-5xl md:text-8xl font-black italic text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-500 mb-6 leading-[0.9]">ZBUDUJ <br/><span className="text-lime-400">LEGENDĘ.</span></h1>
-                    <p className="text-slate-400 text-lg md:text-xl font-light max-w-2xl border-l-4 border-lime-400 pl-6">Części premium do Sur-Ron i Talaria. Zwiększ moc, zasięg i kontrolę.</p>
-                </div>
-            </div>
+            {/* 1. SEKCJE INTRO - WIDOCZNE TYLKO NA STRONIE GŁÓWNEJ ('WSZYSTKIE') */}
+            {isHomePage && (
+                <>
+                    {/* HERO */}
+                    <div className="relative bg-neutral-900 border border-white/5 p-10 md:p-24 mb-16 rounded-[40px] shadow-2xl overflow-hidden group">
+                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-lime-400/10 rounded-full blur-[100px] group-hover:bg-lime-400/20 transition-all duration-1000"></div>
+                        <div className="relative z-10">
+                            <span className="inline-block px-3 py-1 mb-6 border border-lime-400/30 rounded-full bg-lime-400/10 text-lime-400 text-xs font-black uppercase tracking-widest">High Voltage Engineering</span>
+                            <h1 className="text-5xl md:text-8xl font-black italic text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-500 mb-6 leading-[0.9]">ZBUDUJ <br/><span className="text-lime-400">LEGENDĘ.</span></h1>
+                            <p className="text-slate-400 text-lg md:text-xl font-light max-w-2xl border-l-4 border-lime-400 pl-6">Części premium do Sur-Ron i Talaria. Zwiększ moc, zasięg i kontrolę.</p>
+                        </div>
+                    </div>
 
-            {/* FEATURES */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
-                {FEATURES.map((f, i) => (<div key={i} className="bg-white/5 border border-white/5 p-8 rounded-3xl hover:bg-white/10 transition-colors"><div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center text-lime-400 mb-4 border border-white/10">{f.icon}</div><h3 className="text-lg font-black uppercase mb-2">{f.title}</h3><p className="text-slate-400 text-sm">{f.desc}</p></div>))}
-            </div>
+                    {/* FEATURES (JAKOŚĆ PREMIUM) */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+                        {FEATURES.map((f, i) => (<div key={i} className="bg-white/5 border border-white/5 p-8 rounded-3xl hover:bg-white/10 transition-colors"><div className="w-12 h-12 bg-black rounded-xl flex items-center justify-center text-lime-400 mb-4 border border-white/10">{f.icon}</div><h3 className="text-lg font-black uppercase mb-2">{f.title}</h3><p className="text-slate-400 text-sm">{f.desc}</p></div>))}
+                    </div>
 
-            {/* PRODUCTS */}
-            <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-4"><h2 className="text-3xl font-black flex items-center gap-3"><span className="text-lime-400">⚡</span> {activeCategory === 'ALL' ? 'OSTATNIE DROP-Y' : CATEGORIES.find(c => c.id === activeCategory)?.label}</h2></div>
+                     {/* PERFORMANCE CORE */}
+                    <div className="mb-24 relative overflow-hidden rounded-[40px] bg-black border border-white/10">
+                        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent z-10"></div>
+                        <div className="absolute right-0 top-0 h-full w-1/2 bg-lime-900/20 blur-3xl"></div>
+                        
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 p-10 md:p-20 relative z-20 items-center">
+                            <div>
+                                <div className="inline-flex items-center gap-2 text-lime-400 font-bold uppercase tracking-widest text-xs mb-4">
+                                    <Zap size={14} fill="currentColor"/> Performance Core
+                                </div>
+                                <h2 className="text-4xl md:text-6xl font-black italic text-white mb-6 leading-none">CZYSTA <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-500">MOC.</span></h2>
+                                <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                                    Odkryj sterowniki i baterie na ogniwach Molicel.
+                                </p>
+                                <div className="flex gap-4">
+                                    <button onClick={() => setActiveCategory('baterie')} className="bg-lime-400 text-black px-8 py-4 font-black uppercase rounded-xl hover:bg-white transition-all">
+                                        Baterie
+                                    </button>
+                                    <button onClick={() => setActiveCategory('kontrolery')} className="bg-transparent border border-white/20 text-white px-8 py-4 font-black uppercase rounded-xl hover:bg-white/10 transition-all">
+                                        Sterowniki
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="relative h-64 md:h-80 flex items-center justify-center">
+                                {/* Visual placeholder for power module */}
+                                <div className="w-full max-w-sm bg-white/5 backdrop-blur-md border border-white/10 p-8 rounded-3xl transform rotate-3 transition-transform duration-500">
+                                    <div className="flex justify-between items-start mb-8"><Cpu size={48} className="text-lime-400"/><span className="text-xs font-mono text-slate-500">VMP-CTRL-X9000</span></div>
+                                    <div className="space-y-4"><div className="h-2 bg-white/10 rounded-full w-3/4"></div><div className="h-2 bg-white/10 rounded-full w-1/2"></div><div className="h-2 bg-white/10 rounded-full w-full"></div></div>
+                                    <div className="mt-8 pt-8 border-t border-white/10 flex justify-between items-center"><span className="text-white font-bold">TORP / KO</span><span className="text-lime-400 font-mono text-xl">+400% POWER</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
+
+            {/* 2. NAGŁÓWEK I LISTA PRODUKTÓW (WIDOCZNE ZAWSZE, ALE ZMIENIA SIĘ POŁOŻENIE) */}
+            <div className={`flex items-center justify-between mb-8 border-b border-white/10 pb-4 ${isCategoryView ? 'mt-0' : 'mt-16'}`}>
+                <h2 className="text-3xl font-black flex items-center gap-3">
+                    <span className="text-lime-400 text-4xl">⚡</span> 
+                    {activeCategory === 'ALL' ? 'OSTATNIE DROP-Y' : CATEGORIES.find(c => c.id === activeCategory)?.label}
+                </h2>
+                {activeCategory !== 'ALL' && <span className="bg-lime-400 text-black text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">Filtr Aktywny</span>}
+            </div>
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-32">
                 {!supabaseClient ? <div className="col-span-4 text-center py-20 text-lime-400 animate-pulse">Łączenie z bazą...</div> : filteredProducts.length === 0 ? <p className="col-span-4 text-center py-20 text-slate-500 border border-dashed border-white/10 rounded-2xl">Brak produktów.</p> : filteredProducts.map(p => (
                     <div key={p.id} onClick={() => { setActiveProduct(p); setView('product'); window.scrollTo(0,0); }} className="group bg-neutral-900 border border-white/5 p-4 rounded-3xl cursor-pointer hover:-translate-y-2 transition-transform hover:border-lime-400/50 hover:bg-black">
@@ -310,19 +369,7 @@ export default function VoltModsApp() {
                 ))}
             </div>
 
-            {/* HALL OF FAME (NOWOŚĆ - GALERIA) */}
-            <div className="mb-24">
-                <div className="text-center mb-12"><span className="text-lime-400 text-xs font-black uppercase tracking-[0.2em]">Community</span><h2 className="text-4xl md:text-5xl font-black italic text-white">HALL OF <span className="text-lime-400">FAME</span></h2></div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-96">
-                    <div className="relative rounded-3xl overflow-hidden border border-white/10 group md:col-span-2"><img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?q=80&w=1000" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/><div className="absolute bottom-0 left-0 p-6 bg-gradient-to-t from-black via-black/50 to-transparent w-full"><span className="text-lime-400 font-black uppercase">Project: BLACKOUT</span></div></div>
-                    <div className="grid grid-rows-2 gap-4">
-                         <div className="relative rounded-3xl overflow-hidden border border-white/10 group"><img src="https://images.unsplash.com/photo-1517518296538-4b726194b5cb?q=80&w=800" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/><div className="absolute bottom-0 left-0 p-4"><span className="text-white text-xs font-bold uppercase">Rider: Alex</span></div></div>
-                         <div className="relative rounded-3xl overflow-hidden border border-white/10 group"><img src="https://images.unsplash.com/photo-1621644781307-a36c69784132?q=80&w=800" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/><div className="absolute bottom-0 left-0 p-4"><span className="text-white text-xs font-bold uppercase">Rider: Mike</span></div></div>
-                    </div>
-                </div>
-            </div>
-
-            {/* REVIEWS & NEWSLETTER */}
+            {/* REVIEWS & NEWSLETTER - BEZ GALERII */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-white/10 pt-16">
                  <div>
                      <h3 className="text-2xl font-black italic mb-6">OPINIE</h3>
@@ -360,7 +407,6 @@ export default function VoltModsApp() {
         <div className="w-12 h-12 bg-lime-400 text-black font-black flex items-center justify-center text-xs -skew-x-10 mx-auto mb-4">VMP</div>
         <p className="text-slate-600 text-xs mb-6">Volt Mods Poland © 2025</p>
         <div className="flex justify-center gap-6 text-xs font-bold uppercase text-slate-500">
-            {/* Używamy standardowego tagu <a> dla pewności działania w każdym środowisku */}
             <a href="/regulamin" className="hover:text-lime-400 transition-colors">Regulamin</a>
             <span className="cursor-pointer hover:text-lime-400 transition-colors">Dostawa</span>
             <span className="cursor-pointer hover:text-lime-400 transition-colors">Kontakt</span>
